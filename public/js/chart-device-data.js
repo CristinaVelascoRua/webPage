@@ -14,20 +14,20 @@ $(document).ready(() => {
       this.timeData = new Array(this.maxLen);
       this.temperatureData = new Array(this.maxLen);
       this.pressureData = new Array(this.maxLen);
-      this.phData = new Array(this.maxLen);
+      this.PHData = new Array(this.maxLen);
     }
 
-    addData(time, temperature, pressure, ph) {
+    addData(time, temperature, pressure, PH) {
       this.timeData.push(time);
       this.temperatureData.push(temperature);
       this.pressureData.push(pressure);
-      this.phData.push(ph);
+      this.PHData.push(PH);
 
       if (this.timeData.length > this.maxLen) {
         this.timeData.shift();
         this.temperatureData.shift();
         this.pressureData.shift();
-        this.phData.shift();
+        this.PHData.shift();
       }
     }
   }
@@ -61,8 +61,8 @@ $(document).ready(() => {
     datasets: [
       {
         fill: false,
-        label: 'Temperature',
-        yAxisID: 'Temperature',
+        label: 'temperature',
+        yAxisID: 'temperature',
         borderColor: 'rgba(255, 204, 0, 1)',
         pointBoarderColor: 'rgba(255, 204, 0, 1)',
         backgroundColor: 'rgba(255, 204, 0, 0.4)',
@@ -72,8 +72,8 @@ $(document).ready(() => {
       },
       {
         fill: false,
-        label: 'Pressure',
-        yAxisID: 'Pressure',
+        label: 'pressure',
+        yAxisID: 'pressure',
         borderColor: 'rgba(24, 120, 240, 1)',
         pointBoarderColor: 'rgba(24, 120, 240, 1)',
         backgroundColor: 'rgba(24, 120, 240, 0.4)',
@@ -83,8 +83,8 @@ $(document).ready(() => {
       },
       {
         fill: false,
-        label: 'Acidity',
-        yAxisID: 'Acidity',
+        label: 'PH',
+        yAxisID: 'PH',
         borderColor: 'rgba(60, 179, 113, 1)',
         pointBoarderColor: 'rgba(60, 179, 113, 1)',
         backgroundColor: 'rgba(60, 179, 113, 0.4)',
@@ -98,7 +98,7 @@ $(document).ready(() => {
   const chartOptions = {
     scales: {
       yAxes: [{
-        id: 'Temperature',
+        id: 'temperature',
         type: 'linear',
         scaleLabel: {
           labelString: 'Temperature (ºC)',
@@ -107,7 +107,7 @@ $(document).ready(() => {
         position: 'left',
       },
       {
-        id: 'Pressure',
+        id: 'pressure',
         type: 'linear',
         scaleLabel: {
           labelString: 'Pressure (Pa)',
@@ -116,10 +116,10 @@ $(document).ready(() => {
         position: 'right',
       },
       {
-        id: 'pH',
+        id: 'PH',
         type: 'linear',
         scaleLabel: {
-          labelString: 'Acidity (pH)',
+          labelString: 'Acidity (PH)',
           display: true,
         },
         position: 'right',
@@ -147,7 +147,7 @@ $(document).ready(() => {
     chartData.labels = device.timeData;
     chartData.datasets[0].data = device.temperatureData;
     chartData.datasets[1].data = device.pressureData;
-    chartData.datasets[2].data = device.phData;
+    chartData.datasets[2].data = device.PHData;
     myLineChart.update();
   }
   listOfDevices.addEventListener('change', OnSelectionChange, false);
@@ -163,8 +163,8 @@ $(document).ready(() => {
       const messageData = JSON.parse(message.data);
       console.log(messageData);
 
-      // time and either temperature or pressure or ph are required
-      if (!messageData.MessageDate || (!messageData.IotData.temperature && !messageData.IotData.pressure && !messageData.IotData.ph)) {
+      // time and either temperature or pressure or PH are required
+      if (!messageData.MessageDate || (!messageData.IotData.temperature && !messageData.IotData.pressure && !messageData.IotData.PH)) {
         return;
       }
 
@@ -172,14 +172,14 @@ $(document).ready(() => {
       const existingDeviceData = trackedDevices.findDevice(messageData.DeviceId);
 
       if (existingDeviceData) {
-        existingDeviceData.addData(messageData.MessageDate, messageData.IotData.temperature, messageData.IotData.pressure, messageData.IotData.ph);
+        existingDeviceData.addData(messageData.MessageDate, messageData.IotData.temperature, messageData.IotData.pressure, messageData.IotData.PH);
       } else {
         const newDeviceData = new DeviceData(messageData.DeviceId);
         trackedDevices.devices.push(newDeviceData);
         const numDevices = trackedDevices.getDevicesCount();
         deviceCount.innerText = numDevices === 1 ? `${numDevices} device` : `${numDevices} devices`;
-        newDeviceData.addData(messageData.MessageDate, messageData.IotData.temperature, messageData.IotData.pressure, messageData.IotData.ph);
-        
+        newDeviceData.addData(messageData.MessageDate, messageData.IotData.temperature, messageData.IotData.pressure, messageData.IotData.PH);
+
         // add device to the UI list
         const node = document.createElement('option');
         const nodeText = document.createTextNode(messageData.DeviceId);
